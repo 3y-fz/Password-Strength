@@ -20,7 +20,6 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       text-align: center;
       max-width: 400px;
-      width: 90%;
     }
 
     .password-strength h2 {
@@ -93,10 +92,10 @@
       margin-bottom: 10px;
     }
 
-    @media only screen and (max-width: 600px) {
-      .password-strength {
-        max-width: 300px;
-      }
+    .password-strength .toggle-password {
+      font-size: 14px;
+      color: #666;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -109,6 +108,7 @@
     </div>
     <div class="strength-line"></div>
     <div class="strength-label">Password Strength: <span id="strength-text"></span></div>
+    <div class="toggle-password" onclick="togglePasswordVisibility()">Show Password</div>
   </div>
 
   <script>
@@ -116,6 +116,7 @@
     var strengthMeterFill = document.querySelector(".strength-meter-fill");
     var strengthText = document.getElementById("strength-text");
     var strengthLine = document.querySelector(".strength-line");
+    var togglePasswordButton = document.querySelector(".toggle-password");
 
     passwordInput.addEventListener("input", function() {
       var password = passwordInput.value;
@@ -127,26 +128,32 @@
     });
 
     function calculatePasswordStrength(password) {
-      var strength = 0;
+  var strength = 0;
 
-      if (password.length >= 8) {
-        strength += 30;
-      }
+  // Reject passwords containing Arabic characters
+  if (/[\u0600-\u06FF]/.test(password)) {
+    return -1;
+  }
 
-      if (/[A-Z]/.test(password) && /[a-z]/.test(password)) {
-        strength += 30;
-      }
+  if (password.length >= 8) {
+    strength += 30;
+  }
 
-      if (/[0-9]/.test(password)) {
-        strength += 20;
-      }
+  if (/[A-Z]/.test(password) && /[a-z]/.test(password)) {
+    strength += 30;
+  }
 
-      if (/[^A-Za-z0-9]/.test(password)) {
-        strength += 20;
-      }
+  if (/[0-9]/.test(password)) {
+    strength += 20;
+  }
 
-      return strength;
-    }
+  if (/[^A-Za-z0-9]/.test(password)) {
+    strength += 20;
+  }
+
+  return strength;
+}
+
 
     function updateStrengthText(strength) {
       if (strength <= 30) {
@@ -169,6 +176,16 @@
         strengthLine.className = "strength-line strength-line-medium";
       } else {
         strengthLine.className = "strength-line strength-line-strong";
+      }
+    }
+
+    function togglePasswordVisibility() {
+      if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        togglePasswordButton.textContent = "Hide Password";
+      } else {
+        passwordInput.type = "password";
+        togglePasswordButton.textContent = "Show Password";
       }
     }
   </script>
